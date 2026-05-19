@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 // Seven segment display decoder for hexadecimal digits (0-F).
 //
 // Parameters:
@@ -18,9 +20,6 @@
 //               |       |
 //                ———d———
 //
-
-`timescale 1ns / 1ps
-
 module seven_segment #(
     parameter int ACTIVE_LOW = 1
 ) (
@@ -55,6 +54,7 @@ module seven_segment #(
     end
   end
 
+  // Flip all bits of segments_active_high if ACTIVE_LOW is high
   assign segments = ACTIVE_LOW != 0 ? ~segments_active_high : segments_active_high;
 
 endmodule

@@ -12,7 +12,7 @@
 // rst    - Synchronous reset input. When high, the counter resets to 0 on the next rising edge of the clock.
 // enable - When high, the counter will increment on the rising edge of the clock. Otherwise, the counter holds its value.
 // count  - The current count value
-
+//
 module mod_n_counter #(
     parameter int N = 4,  // Modulus of the counter
     parameter int WIDTH = 2  // Bit width of the count output

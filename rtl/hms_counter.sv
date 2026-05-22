@@ -75,7 +75,7 @@ module hms_counter #(
       .count (seconds)
   );
 
-  // Rollover logic: seconds roll over when they reach MaxSeconds, 
+  // Rollover logic: seconds roll over when they reach MaxSeconds,
   // minutes roll over when they reach MaxMinutes and seconds roll over
   assign second_rollover = enable && (seconds == MaxSeconds);
   assign minute_rollover = enable && (minutes == MaxMinutes) && second_rollover;

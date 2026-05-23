@@ -9,6 +9,7 @@
 //
 // To load a different design, instantiate it in place of user_top
 // below.
+//
 // ------------------------------------------------------------------
 `timescale 1ns / 1ps
 

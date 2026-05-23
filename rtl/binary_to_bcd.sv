@@ -15,5 +15,6 @@ module binary_to_bcd (
 );
   // Integer division and modulus operations to extract tens and ones digits
   assign tens = 4'(bin / 7'd10);
+  // Drive ones from 4'(bin % 7'd10).
   assign ones = 4'(bin % 7'd10);
 endmodule

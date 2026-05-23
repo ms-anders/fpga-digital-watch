@@ -21,13 +21,18 @@
 // minutes - Current minutes count output.
 // seconds - Current seconds count output.
 module hms_counter #(
+    // Configurable parameter for module behavior.
     parameter int N_HOURS   = 24,  // number of hours
+    // Configurable parameter for module behavior.
     parameter int N_MINUTES = 60,  // number of minutes
+    // Configurable parameter for module behavior.
     parameter int N_SECONDS = 60,  // number of seconds
 
     // Output port widths
     parameter int W_HOURS   = 5,  // Enough bits to represent 0-23
+    // Configurable parameter for module behavior.
     parameter int W_MINUTES = 6,  // Enough bits to represent 0-59
+    // Configurable parameter for module behavior.
     parameter int W_SECONDS = 6   // Enough bits to represent 0-59
 ) (
     input logic clk,
@@ -39,6 +44,7 @@ module hms_counter #(
   // Maximum values for minutes and seconds,
   // truncated to fit within their respective widths
   localparam logic [W_MINUTES-1:0] MaxMinutes = W_MINUTES'(N_MINUTES - 1);
+  // Internal constant used to configure behavior.
   localparam logic [W_SECONDS-1:0] MaxSeconds = W_SECONDS'(N_SECONDS - 1);
 
   //Initialize rollover signals
@@ -55,6 +61,8 @@ module hms_counter #(
       .count (hours)
   );
 
+  // Counts minutes in the range 0..N_MINUTES-1 (parameter N_MINUTES=60).
+  // Wraps to 0 after reaching N_MINUTES-1 and uses W_MINUTES bits (W_MINUTES=6).
   up_down_counter #(
       .MAX  (N_MINUTES - 1),
       .WIDTH(W_MINUTES)
@@ -64,7 +72,8 @@ module hms_counter #(
       .up    (1'b1),                       // Always count up
       .count (minutes)
   );
-
+  // Counts seconds in the range 0..N_SECONDS-1 (parameter N_SECONDS=60).
+  // Wraps to 0 after reaching N_SECONDS-1 and uses W_SECONDS bits (W_SECONDS=6).
   up_down_counter #(
       .MAX  (N_SECONDS - 1),
       .WIDTH(W_SECONDS)
@@ -78,6 +87,7 @@ module hms_counter #(
   // Rollover logic: seconds roll over when they reach MaxSeconds,
   // minutes roll over when they reach MaxMinutes and seconds roll over
   assign second_rollover = enable && (seconds == MaxSeconds);
+  // Drive minute_rollover from enable && (minutes == MaxMinutes) && second_rollover.
   assign minute_rollover = enable && (minutes == MaxMinutes) && second_rollover;
 
 endmodule

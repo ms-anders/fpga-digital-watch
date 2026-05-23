@@ -21,6 +21,7 @@
 //                ———d———
 //
 module seven_segment #(
+    // Constant parameter used to configure internal behavior.
     parameter int ACTIVE_LOW = 1
 ) (
     input  logic [3:0] digit,
@@ -28,7 +29,9 @@ module seven_segment #(
     output logic [6:0] segments
 );
 
+  // Stores the active-high seven-segment pattern before inversion if needed.
   logic [6:0] segments_active_high;
+  // Compute derived signals using current inputs and matrix logic.
   always_comb begin
     if (blank || $isunknown(digit)) begin
       segments_active_high = 7'b0000000;  // All segments off

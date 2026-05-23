@@ -1,17 +1,17 @@
 `timescale 1ns / 1ps
 
-// Editable Counter
+// Editable Countdown
 //
-// Increments count by 1 on clock cycle when tick is high, wrapping to 0 on overflow
+// Decrements count by 1 on clock cycle when tick is high, wrapping to MAX on underflow
 //
 // Parameters:
-// N     - Value to wrap to 0 on increment
-// WIDTH - Bit width needed to store N
+// MAX   - The max value count can have
+// WIDTH - Bit width needed to store MAX
 //
 // Ports:
 // clk       - Clock input
 // clr       - Clears the count to 0
-// tick      - Increments count when high on a clock posedge
+// tick      - Decrements count when high on a clock posedge
 // edit_mode - When high, stops countdown and allows incrementation and decrementation
 //             of count using inc and dec
 // inc       - When in edit mode, set high to increment count
@@ -19,18 +19,20 @@
 //
 // count      - The count stored in the counter
 // borrow_out - Goes high when count underflows, allowing borrowing from higher order digits
-module editable_counter #(
+module editable_countdown #(
     // Constant parameter used to configure internal behavior.
-    parameter int N = 60,
+    parameter int MAX   = 59,
     // Constant parameter used to configure internal behavior.
     parameter int WIDTH = 6
 ) (
     input  logic             clk,
+    input  logic             clr,
     input  logic             tick,
     input  logic             edit_mode,
     input  logic             inc,
     input  logic             dec,
-    output logic [WIDTH-1:0] count
+    output logic [WIDTH-1:0] count,
+    output logic             borrow_out
 );
 
   // Holds the enable condition used by downstream logic.
@@ -39,11 +41,12 @@ module editable_counter #(
   logic up;
 
   // Counter to control value of count
-  up_down_counter #(
-      .MAX  (N - 1),
+  up_down_counter_rst #(
+      .MAX  (MAX),
       .WIDTH(WIDTH)
   ) u_counter (
       .clk   (clk),
+      .rst   (clr),
       .enable(enable),
       .up    (up),
       .count (count)
@@ -52,12 +55,15 @@ module editable_counter #(
   // Increment and decrement using buttons only when in edit mode, and do nothing when both inc and dec are high
   wire inc_event = edit_mode && inc && !dec;
   wire dec_event = edit_mode && dec && !inc;
-  // Count up when not in edit mode and count not being cleared
-  wire tick_event = !edit_mode && tick;
+  // Count down when not in edit mode and count not being cleared
+  wire tick_event = !edit_mode && tick & !clr;
 
-  // Drive up from not dec_event.
-  assign up = !dec_event;  // Count up when not decrementing
-  // Drive enable from tick_event  or  inc_event  or  dec_event.
-  assign enable = tick_event || inc_event || dec_event;  // Enable counter when an event goes high
+  // Drive up from inc_event.
+  assign up = inc_event;  // Count up on inc_event
+  // Drive enable from inc_event  or  dec_event  or  tick_event.
+  assign enable = inc_event || dec_event || tick_event;  // Enable counter when an event goes high
+
+  // Drive borrow_out from (count  equals  WIDTH'(0))  and  tick_event.
+  assign borrow_out = (count == WIDTH'(0)) && tick_event;  // High when count ticks below 0
 
 endmodule

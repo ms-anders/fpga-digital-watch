@@ -14,7 +14,9 @@
 // count  - The current count value
 //
 module mod_n_counter #(
+    // Constant parameter used to configure internal behavior.
     parameter int N = 4,  // Modulus of the counter
+    // Constant parameter used to configure internal behavior.
     parameter int WIDTH = 2  // Bit width of the count output
 ) (
     input logic clk,
@@ -28,6 +30,7 @@ module mod_n_counter #(
   // Truncate N to fit within WIDTH bits
   localparam logic [WIDTH-1:0] Max = WIDTH'(N - 1);
 
+  // Sequential logic triggered on clock rising edge.
   always_ff @(posedge clk) begin
     // Synchronous reset: if rst is high, reset count to 0.
     // Otherwise, update count
@@ -35,6 +38,7 @@ module mod_n_counter #(
     else if (enable) count <= next_count;
   end
 
+  // Compute derived signals using current inputs and matrix logic.
   always_comb begin
     // Increment count and wrap around to 0 when exceeding Max
     next_count = (count < Max) ? count + WIDTH'(1) : WIDTH'(0);

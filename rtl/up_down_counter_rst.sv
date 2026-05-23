@@ -13,7 +13,9 @@
 // up      - When high, the counter increments; when low, it decrements.
 // count   - The current count value output
 module up_down_counter_rst #(
+    // Constant parameter used to configure internal behavior.
     parameter int MAX   = 2,
+    // Constant parameter used to configure internal behavior.
     parameter int WIDTH = 2
 ) (
     input logic clk,    // Clock input
@@ -30,22 +32,20 @@ module up_down_counter_rst #(
   localparam logic [WIDTH-1:0] Max = WIDTH'(MAX);
 
   // State Flip Flops
-  always_ff @(posedge clk) if (enable) count <= next_count;
+  always_ff @(posedge clk) begin
+    if (rst) count <= WIDTH'(0);
+    else if (enable) count <= next_count;
+  end
 
   // Next state logic
   always_comb begin
-    // If rst is high, set count to 0, otherwise follow count logic
-    if (rst) begin
-      next_count = WIDTH'(0);
+    // Increment if up is high, otherwise decrement
+    if (up) begin
+      // Increment and wrap around to 0 when exceeding Max
+      next_count = (count < Max) ? count + WIDTH'(1) : WIDTH'(0);
     end else begin
-      // Increment if up is high, otherwise decrement
-      if (up) begin
-        // Increment and wrap around to 0 when exceeding Max
-        next_count = (count < Max) ? count + WIDTH'(1) : WIDTH'(0);
-      end else begin
-        // Decrement and wrap around to Max when falling below 0
-        next_count = (count > 0) ? count - WIDTH'(1) : Max;
-      end
+      // Decrement and wrap around to Max when falling below 0
+      next_count = (count > 0) ? count - WIDTH'(1) : Max;
     end
   end
 endmodule

@@ -19,10 +19,13 @@ async def tick_n(dut, n):
 
 async def press(dut, bit):
     """Single button press: raise button[bit] for one cycle then release."""
+    cocotb.log.info(f"  [press start] counter_enable={int(dut.counter_enable.value)}")
     dut.button.value = 1 << bit
     await tick(dut)
+    cocotb.log.info(f"  [press middle] button={int(dut.button.value)}, counter_enable={int(dut.counter_enable.value)}, centiseconds={int(dut.centiseconds.value) if hasattr(dut, 'centiseconds') else '?'}")
     dut.button.value = 0
     await tick(dut)
+    cocotb.log.info(f"  [press end] counter_enable={int(dut.counter_enable.value)}, centiseconds={int(dut.centiseconds.value) if hasattr(dut, 'centiseconds') else '?'}")
 
 
 @cocotb.test()
@@ -61,8 +64,13 @@ async def test_stopwatch(dut):
     cocotb.log.info("Section 2: counter advances after start")
     await press(dut, 0)  # start/stop -> start
     cs_after_start = int(dut.seconds_disp.value)
-    await tick_n(dut, 4 * CSTICK)
-    assert int(dut.seconds_disp.value) > cs_after_start, (
+    cocotb.log.info(f"  counter_enable={int(dut.counter_enable.value)}, centiseconds={int(dut.centiseconds.value)}, seconds_disp={cs_after_start}")
+    for i in range(2 * CSTICK):
+        await tick(dut)
+        cocotb.log.info(f"  cycle {i+1}: counter_enable={int(dut.counter_enable.value)}, centiseconds={int(dut.centiseconds.value)}, seconds_disp={int(dut.seconds_disp.value)}")
+    cs_final = int(dut.seconds_disp.value)
+    cocotb.log.info(f"  Final: cs_after_start={cs_after_start}, cs_final={cs_final}")
+    assert cs_final > cs_after_start, (
         "seconds_disp must increment while running"
     )
 

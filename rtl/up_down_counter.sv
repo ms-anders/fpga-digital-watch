@@ -13,7 +13,9 @@
 // up      - When high, the counter increments; when low, it decrements.
 // count   - The current count value output
 module up_down_counter #(
+    // Constant parameter used to configure internal behavior.
     parameter int MAX   = 2,
+    // Constant parameter used to configure internal behavior.
     parameter int WIDTH = 2
 ) (
     input logic clk,    // Clock input

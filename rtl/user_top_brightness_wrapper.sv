@@ -2,15 +2,15 @@
 
 // Brightness Wrapper Top Level
 //
-// Wraps the main user_top application and adds PWM-based brightness blanking.
+// Wraps a main user_top application and adds PWM-based brightness blanking.
 //
 // Parameters:
 // CYCLES_PER_SECOND - Number of clock cycles in one second for the input clock.
 //
 // Ports:
 // clk           - Clock input.
-// button        - Button inputs passed through to the wrapped user_top.
-// sw            - Switch inputs passed through to the wrapped user_top.
+// button        - Button inputs passed through to the wrapped user_top module.
+// sw            - Switch inputs passed through to the wrapped user_top module.
 // led           - LED outputs from the wrapped user_top.
 // hours_disp    - Seven-segment output for hours digits.
 // minutes_disp  - Seven-segment output for minutes digits.
@@ -98,7 +98,7 @@ module user_top_brightness_wrapper #(
 
   // Holds the PWM blanking output used to dim display segments.
   logic pwm_out;
-  // Select pwm_out based on the condition (sw[9:8] == 2'b10).
+  // Output unmodified signal when brightness switches are set to 2'b10 (full brightness)
   assign pwm_out = (sw[9:8] == 2'b10) ? 1'b1 : (pwm_count < duty_cycle);
 
   // Drive blank_hours from blank_hours_probe  or  not pwm_out.

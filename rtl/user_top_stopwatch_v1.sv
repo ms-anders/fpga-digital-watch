@@ -19,7 +19,6 @@
 // Stopwatch Top Level v1
 //
 // Implements stopwatch functionality with start/stop, lap, and display hold behavior.
-// This module is also used by the automated test suite and includes a template-style wrapper.
 //
 // Parameters:
 // CYCLES_PER_SECOND - Number of clock cycles in one second for the input clock.
@@ -114,7 +113,7 @@ module user_top_stopwatch_v1 #(
 
 
 
-  // Captures a snapshot of input data while hold is active.
+  // Captures a snapshot of input data while lap_hold is active.
   snapshot_mux #(
       .WIDTH(21)
   ) u_snashot_mux (

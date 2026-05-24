@@ -150,17 +150,14 @@ module user_top_watch_v4 #(
   // Drive minutes_tick from seconds_tick  and  (seconds  >=  6'd59).
   assign minutes_tick = seconds_tick && (seconds >= 6'd59);
   // Drive hours_tick from minutes_tick  and  (minutes  >=  6'd59).
-  assign hours_tick = minutes_tick && (minutes >= 6'd59);
+  assign hours_tick   = minutes_tick && (minutes >= 6'd59);
 
   // Drive seconds_disp from {1'b0, seconds}.
   assign seconds_disp = {1'b0, seconds};
   // Drive minutes_disp from {1'b0, minutes}.
   assign minutes_disp = {1'b0, minutes};
   // Drive hours_disp from {2'b0, hours}.
-  assign hours_disp = {2'b0, hours};
-
-  // Drive led from 10'b0.
-  assign led = 10'b0;
+  assign hours_disp   = {2'b0, hours};
 
 
 
@@ -254,5 +251,17 @@ module user_top_watch_v4 #(
   // ---------------------------------
 
   assign run_rate_gen = !seconds_edit;
+
+  // --------------------
+  // - Hour Chime Logic -
+  // --------------------
+
+  hour_chime #(
+      .CYCLES_PER_SECOND(CYCLES_PER_SECOND)
+  ) u_chime (
+      .clk(clk),
+      .hours_tick(hours_tick),
+      .led_out(led)
+  );
 
 endmodule
